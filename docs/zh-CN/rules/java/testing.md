@@ -128,6 +128,40 @@ class OrderRepositoryIT {
 * 使用 JaCoCo 生成覆盖率报告
 * 重点关注服务和领域逻辑 — 跳过简单的 getter/配置类
 
+## 阿里巴巴规范 —— 单元测试要求
+
+- 单元测试必须覆盖 **BCDE** 四类场景：Border（边界值）、Correct（正确输入）、Design（设计文档对应场景）、Error（错误输入）
+- 每个测试方法只测试**一个**逻辑场景，测试体内禁止出现分支判断
+- 测试必须完全**独立**：测试方法间无共享可变状态，无执行顺序依赖
+- 单元测试中必须 Mock 所有外部依赖（DB、HTTP、缓存、文件系统），Testcontainers 仅用于集成测试
+- 测试方法命名：`methodName_scenario_expectedResult()`，不读方法体也能理解测试意图
+- 测试中禁止使用 `System.out.println`，使用 AssertJ 断言或 logger
+- 单元测试每个用例执行时间必须**在 1 秒以内**；慢测试使用 `@Tag("slow")` 标记
+- 核心领域/服务逻辑（`src/core/**`、`src/service/**`）必须达到 **100% 分支覆盖**
+- 每个测试必须包含至少一个**正常路径**和一个**错误路径**用例
+
+```java
+// 正确 —— 命名规范、测试隔离、BCDE 覆盖
+@Test
+@DisplayName("折扣超过 100% 时抛出 IllegalArgumentException")
+void applyDiscount_discountOver100_throwsIllegalArgument() {
+    // Arrange
+    var price = new BigDecimal("100.00");
+
+    // Act & Assert
+    assertThatThrownBy(() -> PricingUtils.applyDiscount(price, 101))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("discount");
+}
+
+@Test
+@DisplayName("折扣为 100% 时返回零")
+void applyDiscount_discount100_returnsZero() {
+    assertThat(PricingUtils.applyDiscount(new BigDecimal("100.00"), 100))
+        .isEqualByComparingTo(BigDecimal.ZERO);
+}
+```
+
 ## 参考
 
 关于使用 MockMvc 和 Testcontainers 的 Spring Boot TDD 模式，请参阅技能：`springboot-tdd`。
