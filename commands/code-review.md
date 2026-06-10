@@ -71,7 +71,67 @@ Generate report with:
 Block commit if CRITICAL or HIGH issues found.
 Never approve code with security vulnerabilities.
 
----
+### Phase 4 — APPEND RELEASE PLAN
+
+After the review report is generated (regardless of outcome), scan `docs/` for design documents and append a release plan section to each qualifying file.
+
+**Document discovery**: A `.md` file qualifies if its filename or top-level heading contains `prd`, `adr`, `spec`, `design`, `architecture`, `runbook`, or `plan`, and it is not `README.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, `CLAUDE.md`, or `SECURITY.md`. Skip files with `status: Deprecated` in frontmatter. Skip files that already contain a `## 上线计划` or `## Release Plan` section.
+
+**Append the following section to each qualifying document:**
+
+```markdown
+## Release Plan
+
+**Status**: Ready to release
+**Release date**: {YYYY-MM-DD}
+**Branch**: {current branch name}
+
+### Release scope
+
+{1-3 sentences summarising the feature from the document's description}
+
+### Pre-release checklist
+
+- [ ] All unit and integration tests pass
+- [ ] Code review approved (no CRITICAL or HIGH issues)
+- [ ] Security scan passed
+- [ ] Quality gate is green
+- [ ] Design document status updated to `Approved`
+- [ ] Database migration scripts reviewed and tested in staging
+- [ ] Production env vars and secrets configured
+- [ ] Downstream dependents notified of interface changes (if any)
+
+### Deployment steps
+
+1. Merge PR into `master` after final approval
+2. CI/CD pipeline triggers automatically — monitor build and test stages
+3. Deploy to staging and run smoke tests
+4. Verify key metrics and logs (error rate, latency, CPU/memory)
+5. Deploy to production (blue-green or rolling)
+6. Run post-deploy smoke tests against production endpoints
+7. Monitor for 30 minutes; watch error alerts and dashboards
+
+### Rollback plan
+
+- **Trigger**: error rate > 1% or P95 latency > 2× baseline within 30 minutes of deploy
+- **Action**: revert the merge commit or redeploy the previous image
+
+### Post-release verification
+
+- [ ] Production smoke tests pass
+- [ ] No significant increase in error rate or latency
+- [ ] Key business flows manually verified (2-3 critical paths)
+- [ ] On-call engineer aware and monitoring for 30 minutes post-deploy
+- [ ] Release statistics document updated with release notes
+
+### Stakeholders
+
+| Role | Owner |
+|------|-------|
+| Release owner | {git config user.name} |
+```
+
+Report which files were updated and which were skipped.
 
 ## PR Review Mode
 
@@ -227,6 +287,10 @@ Create review artifact at `.claude/reviews/pr-<NUMBER>-review.md` unless the rep
 ## Files Reviewed
 <list of files with change type: Added/Modified/Deleted>
 ```
+
+### Append Release Plan
+
+After writing the review artifact, scan `docs/` for design documents and append a release plan section to each qualifying file — same rules and template as Local Review Mode Phase 4.
 
 ### Phase 7 — PUBLISH
 
