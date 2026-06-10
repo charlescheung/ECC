@@ -14,7 +14,9 @@ Run inline by default. Do not call the Task tool or any subagent by default. Thi
 1. **Restate Requirements** - Clarify what needs to be built
 2. **Identify Risks** - Surface potential issues and blockers
 3. **Create Step Plan** - Break down implementation into phases
-4. **Wait for Confirmation** - MUST receive user approval before proceeding
+4. **Generate Design Doc** - Generate a design doc under the project `docs/` directory
+5. **Generate Release Plan** - Generate a qualifying release plan section
+6. **Wait for Confirmation** - MUST receive user approval before proceeding
 
 ## When to Use
 
@@ -35,7 +37,8 @@ The assistant will:
 4. **Identify dependencies** between components
 5. **Assess risks** and potential blockers
 6. **Estimate complexity** (High/Medium/Low)
-7. **Present the plan** and WAIT for your explicit confirmation
+7. **Generate release plan** — generate a qualifying release plan section (see template below)
+8. **Present the plan** and WAIT for your explicit confirmation
 
 ## Input Modes
 
@@ -178,12 +181,68 @@ If you want changes, respond with:
 - "different approach: [alternative]"
 - "skip phase 2 and do phase 3 first"
 
+## Release Plan Template
+
+**Document discovery**: A `.md` file qualifies if its filename or top-level heading contains `prd`, `adr`, `spec`, `design`, `architecture`, `runbook`, or `plan`. Exclude `README.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, `CLAUDE.md`, `SECURITY.md`, and files with `status: Deprecated` in frontmatter.
+
+```markdown
+**Status**: Ready to release
+**Release date**: {YYYY-MM-DD}
+**Branch**: {current branch name}
+
+### 1. Release scope
+
+{1-3 sentences summarising the feature from the document's description}
+
+### 2. Pre-release checklist
+
+- [ ] All unit and integration tests pass
+- [ ] Code review approved (no CRITICAL or HIGH issues)
+- [ ] Security scan passed
+- [ ] Quality gate is green
+- [ ] Design document status updated to `Approved`
+- [ ] Database migration scripts reviewed and tested in staging
+- [ ] Production env vars and secrets configured
+- [ ] Downstream dependents notified of interface changes (if any)
+
+### 3. Deployment steps
+
+1. Merge PR into `master` after final approval
+2. CI/CD pipeline triggers automatically — monitor build and test stages
+3. Deploy to staging and run smoke tests
+4. Verify key metrics and logs (error rate, latency, CPU/memory)
+5. Deploy to production (blue-green or rolling)
+6. Run post-deploy smoke tests against production endpoints
+7. Monitor for 30 minutes; watch error alerts and dashboards
+
+### 4. Rollback plan
+
+- **Trigger**: error rate > 1% or P95 latency > 2× baseline within 30 minutes of deploy
+- **Action**: revert the merge commit or redeploy the previous image
+
+### 5. Post-release verification
+
+- [ ] Production smoke tests pass
+- [ ] No significant increase in error rate or latency
+- [ ] Key business flows manually verified (2-3 critical paths)
+- [ ] On-call engineer aware and monitoring for 30 minutes post-deploy
+- [ ] Release statistics document updated with release notes
+
+### 6. Stakeholders
+
+| Role | Owner |
+|------|-------|
+| Release owner | {git config user.name} |
+```
+
+Report which files were updated and which were skipped.
+
 ## Integration with Other Commands
 
 After planning:
 - Use the `tdd-workflow` skill to implement with test-driven development
 - Use `/build-fix` if build errors occur
-- Use `/code-review` to review completed implementation
+- Use `/code-review` to review completed implementation (updates release plan status in design docs)
 - Use `/pr` or `/prp-pr` to open a pull request
 
 > **Need requirements first?** Use `/plan-prd` for a lean PRD at `.claude/prds/{name}.prd.md`.
