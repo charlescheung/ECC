@@ -126,6 +126,40 @@ Use descriptive names with `@DisplayName`:
 - Use JaCoCo for coverage reporting
 - Focus on service and domain logic — skip trivial getters/config classes
 
+## Alibaba Unit Test Rules (阿里规范 — 单元测试)
+
+- Unit tests must be **BCDE**: Border (边界值), Correct (正确输入), Design (设计文档对应场景), Error (错误输入)
+- Each test method tests **one** logical scenario — no branching inside a test
+- Tests must be fully **independent**: no shared mutable state between test methods, no execution-order dependency
+- Mock all external dependencies (DB, HTTP, cache, filesystem) in unit tests — use Testcontainers only in integration tests
+- Test method naming: `methodName_scenario_expectedResult()` — must be self-documenting without reading the body
+- Do not use `System.out.println` in tests — use AssertJ assertions or logger
+- Tests must run in **under 1 second** each for unit tests; flag slow tests with `@Tag("slow")`
+- Achieve **100% branch coverage** for core domain/service logic (`src/core/**`, `src/service/**`)
+- Every test must include at least one **happy path** and one **error path** case
+
+```java
+// GOOD — naming, isolation, and BCDE coverage
+@Test
+@DisplayName("applyDiscount throws when discount exceeds 100%")
+void applyDiscount_discountOver100_throwsIllegalArgument() {
+    // Arrange
+    var price = new BigDecimal("100.00");
+
+    // Act & Assert
+    assertThatThrownBy(() -> PricingUtils.applyDiscount(price, 101))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("discount");
+}
+
+@Test
+@DisplayName("applyDiscount returns zero when discount is 100%")
+void applyDiscount_discount100_returnsZero() {
+    assertThat(PricingUtils.applyDiscount(new BigDecimal("100.00"), 100))
+        .isEqualByComparingTo(BigDecimal.ZERO);
+}
+```
+
 ## References
 
 See skill: `springboot-tdd` for Spring Boot TDD patterns with MockMvc and Testcontainers.

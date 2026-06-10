@@ -35,13 +35,29 @@ npm test
 
 ### 5. 重构 (改进)
 
-消除重复、改进命名、优化 -- 测试必须保持通过。
+消除重复、改进命名、优化 —— 测试必须保持通过。
+
+**Java 项目**的重构阶段，在标记循环完成前必须通过 `rules/java/` 规范检查：
+
+- [ ] 命名符合阿里规范：布尔字段无 `is` 前缀；抽象类/异常类/测试类有对应后缀；常量为 `UPPER_SNAKE_CASE`
+- [ ] 所有公共类及公共/受保护方法有 Javadoc，包含 `@param`/`@return`
+- [ ] `String` 和包装类型比较使用 `Objects.equals()`，禁止 `==`
+- [ ] 循环内无 `+` 字符串拼接，使用 `StringBuilder` 或 `String.join()`
+- [ ] `HashMap`/`ArrayList` 构造时指定初始容量
+- [ ] Map 同时遍历 key+value 时使用 `entrySet()`
+- [ ] 线程池使用 `ThreadPoolExecutor` 并显式指定边界，禁止 `Executors` 工厂方法
+- [ ] 日志语句使用 `{}` 占位符，禁止字符串拼接
+- [ ] 分层结构正确：Controller → Service → Repository，领域对象不泄漏到 Controller
+- [ ] 3 个以上分支的 `if-else` 链替换为策略 Map
+- [ ] 所有重写方法加 `@Override`
+- [ ] `equals()` 和 `hashCode()` 始终成对重写
 
 ### 6. 验证覆盖率
 
 ```bash
 npm run test:coverage
-# Required: 80%+ branches, functions, lines, statements
+# 要求：分支、函数、行、语句 80%+
+# Java core/service 逻辑：100% 分支覆盖
 ```
 
 ## 所需的测试类型

@@ -122,6 +122,21 @@ npm test
 * 优化性能
 * 增强可读性
 
+**Java 项目 —— 阿里规范检查清单（标记 GREEN→REFACTOR 完成前必须全部通过）：**
+
+- [ ] 命名：布尔字段无 `is` 前缀；`Abstract`/`Exception`/`Test` 类后缀正确；常量为 `UPPER_SNAKE_CASE`
+- [ ] 所有公共类及公共/受保护方法有 Javadoc，包含 `@param`、`@return`、`@throws`
+- [ ] `String`/包装类型比较使用 `Objects.equals()`，禁止 `==`
+- [ ] 循环内禁止 `+` 字符串拼接，使用 `StringBuilder` 或 `String.join()`
+- [ ] `HashMap`/`ArrayList` 构造时指定初始容量
+- [ ] 同时需要 key+value 时使用 `entrySet()` 迭代
+- [ ] 线程池使用 `ThreadPoolExecutor` 并显式设置边界，禁止 `Executors` 工厂方法
+- [ ] 日志语句使用 `{}` 占位符，禁止字符串拼接
+- [ ] 分层结构：Controller → Service → Repository，领域对象禁止泄漏到 Controller
+- [ ] 3 个以上分支的 `if-else` 链替换为策略 Map
+- [ ] 所有重写方法加 `@Override`
+- [ ] `equals()` 和 `hashCode()` 始终成对重写
+
 ### 步骤 7: 验证覆盖率
 
 ```bash

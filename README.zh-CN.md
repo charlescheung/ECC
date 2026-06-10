@@ -626,7 +626,7 @@ cp -r everything-claude-code/skills/search-first ~/.claude/skills/
 
 # 可选：迁移期间保留维护中的斜杠命令兼容
 mkdir -p ~/.claude/commands
-cp everything-claude-code/commands/*.md ~/.claude/commands/
+cp docs/zh-CN/commands/*.md ~/.claude/commands/
 
 # 已退役短命令位于 legacy-command-shims/commands/。
 # 仅在仍需要 /tdd 等旧名称时，单独复制对应文件。

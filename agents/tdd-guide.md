@@ -42,10 +42,25 @@ Only enough code to make the test pass.
 ### 5. Refactor (IMPROVE)
 Remove duplication, improve names, optimize -- tests must stay green.
 
+**For Java projects**, refactor must also satisfy `rules/java/` standards before the cycle is complete:
+
+- [ ] Naming follows Alibaba conventions (no `is`-prefixed boolean fields, `Abstract`/`Exception`/`Test` suffixes, `UPPER_SNAKE_CASE` constants)
+- [ ] All public classes and public/protected methods have Javadoc with `@param`/`@return`
+- [ ] No `==` comparison on `String` or boxed types; use `Objects.equals()`
+- [ ] No string concatenation (`+`) inside loops — use `StringBuilder` or `String.join()`
+- [ ] `HashMap`/`ArrayList` constructed with explicit initial capacity
+- [ ] `entrySet()` used when iterating map key+value pairs
+- [ ] Thread pools created via `ThreadPoolExecutor` with explicit bounds, not `Executors` shortcuts
+- [ ] Log statements use `{}` placeholders, not string concatenation
+- [ ] Layer separation respected: Controller → Service → Repository, no skipping
+- [ ] Strategy pattern preferred over `if-else` chains of 3+ branches
+- [ ] `@Override` present on all overriding methods
+
 ### 6. Verify Coverage
 ```bash
 npm run test:coverage
 # Required: 80%+ branches, functions, lines, statements
+# Java core/service logic: 100% branch coverage required
 ```
 
 ## Test Types Required

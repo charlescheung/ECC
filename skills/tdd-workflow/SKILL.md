@@ -158,6 +158,21 @@ Improve code quality while keeping tests green:
 - Optimize performance
 - Enhance readability
 
+**Java projects — Alibaba spec checklist (must pass before marking GREEN→REFACTOR complete):**
+
+- [ ] Naming: no `is`-prefixed boolean fields; `Abstract`/`Exception`/`Test` class suffixes applied; constants are `UPPER_SNAKE_CASE`
+- [ ] Javadoc on all public classes and public/protected methods (`@param`, `@return`, `@throws`)
+- [ ] No `==` on `String`/boxed types — use `Objects.equals()`
+- [ ] No `+` string concat in loops — use `StringBuilder` or `String.join()`
+- [ ] `HashMap`/`ArrayList` initialized with explicit capacity
+- [ ] Map iteration uses `entrySet()` when both key and value are needed
+- [ ] Thread pools use `ThreadPoolExecutor` with explicit bounds — no `Executors` factory shortcuts
+- [ ] Log statements use `{}` placeholders — no string concat in log calls
+- [ ] Layer separation: Controller → Service → Repository only; domain objects do not leak to Controller
+- [ ] Strategy/Map lookup replaces `if-else` chains of 3+ branches
+- [ ] `@Override` on all overriding methods
+- [ ] `equals()` and `hashCode()` always overridden together
+
 If the repository is under Git, create a checkpoint commit immediately after refactoring is complete and tests remain green.
 Recommended commit message format:
 - `refactor: clean up after <feature or bug> implementation`
